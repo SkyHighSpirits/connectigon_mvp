@@ -49,6 +49,27 @@ public class ChatController {
         }
     }
 
+    @GetMapping("/checkchat")
+    public ResponseEntity<?> checkIfChatExists(@RequestParam int from, @RequestParam int to) {
+        User fromUser = userRepository.findById(from).orElse(null);
+        User toUser = userRepository.findById(to).orElse(null);
+
+        if (fromUser == null || toUser == null) {
+            return ResponseEntity.notFound().build(); // Either user not found
+        }
+
+        Optional<List<Chat>> chatsFromToExists = chatRepository.findAllByUser1AndUser2(fromUser, toUser);
+        Optional<List<Chat>> chatsToFromExists = chatRepository.findAllByUser1AndUser2(toUser, fromUser);
+
+        if (chatsFromToExists.isPresent() && !chatsFromToExists.get().isEmpty()) {
+            return ResponseEntity.ok().body(chatsFromToExists.get()); // Chat exists from user1 to user2
+        } else if (chatsToFromExists.isPresent() && !chatsToFromExists.get().isEmpty()) {
+            return ResponseEntity.ok().body(chatsToFromExists.get()); // Chat exists from user2 to user1
+        } else {
+            return ResponseEntity.notFound().build(); // Chat doesn't exist
+        }
+    }
+
     @GetMapping("/getallmychats")
     public ResponseEntity<List<Chat>> getAllMyChats(@RequestParam int userId)
     {
