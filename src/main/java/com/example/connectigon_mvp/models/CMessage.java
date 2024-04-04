@@ -12,18 +12,14 @@ public class CMessage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     int id;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne()
     @JoinColumn(name = "sent_by_user_id")
     User sentByUserid;
-
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "received_by_user_id")
-    User receivedById;
 
     LocalDateTime dateTime;
 
     @JsonBackReference
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne()
     @JoinColumn(name = "chat")
     Chat chat;
 
@@ -32,10 +28,9 @@ public class CMessage {
     public CMessage() {
     }
 
-    public CMessage(int id, User sentByUserid, User receivedById, LocalDateTime dateTime, Chat chat, String message) {
+    public CMessage(int id, User sentByUserid, LocalDateTime dateTime, Chat chat, String message) {
         this.id = id;
         this.sentByUserid = sentByUserid;
-        this.receivedById = receivedById;
         this.dateTime = dateTime;
         this.chat = chat;
         this.message = message;
@@ -55,14 +50,6 @@ public class CMessage {
 
     public void setSentByUserid(User sentByUserid) {
         this.sentByUserid = sentByUserid;
-    }
-
-    public User getReceivedById() {
-        return receivedById;
-    }
-
-    public void setReceivedById(User receivedById) {
-        this.receivedById = receivedById;
     }
 
     public LocalDateTime getDateTime() {

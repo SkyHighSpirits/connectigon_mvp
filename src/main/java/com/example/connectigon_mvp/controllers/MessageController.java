@@ -1,7 +1,9 @@
 package com.example.connectigon_mvp.controllers;
 
 import com.example.connectigon_mvp.models.CMessage;
+import com.example.connectigon_mvp.models.Chat;
 import com.example.connectigon_mvp.models.User;
+import com.example.connectigon_mvp.repositories.ChatRepository;
 import com.example.connectigon_mvp.repositories.MessageRepository;
 import com.example.connectigon_mvp.repositories.UserRepository;
 import org.apache.logging.log4j.message.Message;
@@ -27,6 +29,9 @@ public class MessageController {
     @Autowired
     UserRepository userRepository;
 
+    @Autowired
+    ChatRepository chatRepository;
+
     @PostMapping("/sendmessage")
     public ResponseEntity<String> sendMessage(@RequestParam int fromId, @RequestParam int toId)
     {
@@ -34,7 +39,6 @@ public class MessageController {
            CMessage message = new CMessage();
 
            message.setSentByUserid(userRepository.findById(fromId).get());
-           message.setReceivedById(userRepository.findById(toId).get());
            message.setDateTime(LocalDateTime.now());
 
            messageRepository.save(message);
@@ -46,14 +50,37 @@ public class MessageController {
        }
     }
 
+    @GetMapping("/getAllMessagesFromChat")
+    public ResponseEntity<List<CMessage>> getAllMessagesFromChatroom(@RequestParam int chatid) {
+        System.out.println("Got this far");
+        try {
+            Optional<Chat> mychat = chatRepository.findById(chatid);
+            Chat chatObject = mychat.get();
+            System.out.println(chatObject);
+            Optional<List<CMessage>> messages = messageRepository.findCMessagesByChat(chatObject);
+            if (messages.isPresent()) {
+                List<CMessage> newCMessages = messages.get();
+
+                return ResponseEntity.ok().body(newCMessages);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
     @GetMapping("/getallmessages")
-    public ResponseEntity<List<CMessage>> getAllLatestMessages(@RequestParam int user_id) {
+    public ResponseEntity<List<CMessage>> getAllLatestMessages(@RequestParam int chat_id, @RequestParam int user_id) {
 
         try {
             Optional<User> myself = userRepository.findById(user_id);
+            Optional<Chat> mychat = chatRepository.findById(chat_id);
             User userObjectMyself = myself.get();
+            Chat chatObject = mychat.get();
 
-            Optional<List<CMessage>> messages = messageRepository.findMessagesByDateTimeIsAfterAndReceivedByIdOrSentByUseridOrderByDateTime(LocalDateTime.now().minusWeeks(1), userObjectMyself, userObjectMyself);
+            Optional<List<CMessage>> messages = messageRepository.findCMessagesByChatAndSentByUserid(chatObject, userObjectMyself);
 
             if (messages.isPresent()) {
                 List<CMessage> newCMessages = messages.get();
@@ -73,7 +100,7 @@ public class MessageController {
     public ResponseEntity<List<CMessage>> getNewMessagesFromUser(@RequestParam int user_id) {
 
         try {
-            Optional<List<CMessage>> messages = messageRepository.findMessagesByDateTimeIsAfterOrderByDateTime(LocalDateTime.now().minusWeeks(1));
+            Optional<List<CMessage>> messages = messageRepository.findCMessagesByDateTimeIsAfterOrderByDateTime(LocalDateTime.now().minusWeeks(1));
 
             if (messages.isPresent()) {
                 List<CMessage> newCMessages = messages.get();
