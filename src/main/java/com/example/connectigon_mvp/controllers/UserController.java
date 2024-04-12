@@ -3,6 +3,7 @@ package com.example.connectigon_mvp.controllers;
 
 import com.example.connectigon_mvp.models.User;
 import com.example.connectigon_mvp.repositories.UserRepository;
+import com.example.connectigon_mvp.services.DummyDataService;
 import com.example.connectigon_mvp.services.PasswordHashingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -95,11 +96,13 @@ public class UserController {
     )
     {
         User user = new User();
+        DummyDataService dummyDataService = new DummyDataService();
         try{
             user.setName(name);
             user.setEmail(email);
-            user.setDescription("Default description");
-
+            user.setAge(dummyDataService.getChosenAge());
+            user.setDescription(dummyDataService.getChosenDescription());
+            user.setTitle(dummyDataService.getChosenTitle());
             String hashedPassword = passwordHashingService.doHashing(password);
             user.setPassword(hashedPassword);
             user.setEmail(email);

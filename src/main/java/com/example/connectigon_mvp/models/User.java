@@ -17,6 +17,10 @@ public class User {
 
     String name;
 
+    String age;
+
+    String title;
+
     String description;
 
     String email;
@@ -26,12 +30,30 @@ public class User {
     public User() {
     }
 
-    public User(int id, String name, String description, String email, String password) {
+    public User(int id, String name, String age, String title, String description, String email, String password) {
         this.id = id;
         this.name = name;
+        this.age = age;
+        this.title = title;
         this.description = description;
         this.email = email;
         this.password = password;
+    }
+
+    public String getAge() {
+        return age;
+    }
+
+    public void setAge(String age) {
+        this.age = age;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public int getId() {
@@ -79,6 +101,8 @@ public class User {
         return "User{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
+                ", age='" + age + '\'' +
+                ", title='" + title + '\'' +
                 ", description='" + description + '\'' +
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
